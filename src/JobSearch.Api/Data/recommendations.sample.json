@@ -1,0 +1,54 @@
+[
+  {
+    "companyName": "Hanul Tech",
+    "jobTitle": "Junior Backend Developer",
+    "ageGroup": "twenties",
+    "platform": "Saramin",
+    "industry": "IT/Development",
+    "experienceLevel": "Entry",
+    "employmentType": "FullTime",
+    "region": "Seoul",
+    "salaryMillionKrw": 38,
+    "summary": "Entry-level backend role with mentoring support and structured onboarding.",
+    "suitabilityScore": 0.91
+  },
+  {
+    "companyName": "Mirae Manufacturing",
+    "jobTitle": "Production Planning Specialist",
+    "ageGroup": "thirties",
+    "platform": "JobKorea",
+    "industry": "Manufacturing",
+    "experienceLevel": "Experienced",
+    "employmentType": "FullTime",
+    "region": "Gyeonggi",
+    "salaryMillionKrw": 52,
+    "summary": "Mid-career production planning role for candidates with process optimization experience.",
+    "suitabilityScore": 0.88
+  },
+  {
+    "companyName": "Seojin Care",
+    "jobTitle": "Operations Manager",
+    "ageGroup": "forties",
+    "platform": "Saramin",
+    "industry": "Healthcare",
+    "experienceLevel": "Experienced",
+    "employmentType": "Flexible",
+    "region": "Busan",
+    "salaryMillionKrw": 49,
+    "summary": "Operations-focused management role suited for career-transition applicants.",
+    "suitabilityScore": 0.86
+  },
+  {
+    "companyName": "Daehan Support",
+    "jobTitle": "Senior Administrative Coordinator",
+    "ageGroup": "fiftiesAndAbove",
+    "platform": "JobKorea",
+    "industry": "Corporate Support",
+    "experienceLevel": "Experienced",
+    "employmentType": "Contract",
+    "region": "Daegu",
+    "salaryMillionKrw": 41,
+    "summary": "Stable coordination role emphasizing prior administrative and communication experience.",
+    "suitabilityScore": 0.84
+  }
+]

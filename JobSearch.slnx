@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/JobSearch.Api/JobSearch.Api.csproj" />
+    <Project Path="src/JobSearch.Application/JobSearch.Application.csproj" />
+    <Project Path="src/JobSearch.Contracts/JobSearch.Contracts.csproj" />
+    <Project Path="src/JobSearch.Desktop/JobSearch.Desktop.csproj" />
+    <Project Path="src/JobSearch.Domain/JobSearch.Domain.csproj" />
+    <Project Path="src/JobSearch.Infrastructure/JobSearch.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JobSearch.UnitTests/JobSearch.UnitTests.csproj" />
+  </Folder>
+</Solution>

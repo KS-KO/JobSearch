@@ -1,0 +1,253 @@
+<Window x:Class="JobSearch.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="JobSearch Desktop"
+        Width="1280"
+        Height="820"
+        MinWidth="1080"
+        MinHeight="720"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid Background="#F3F4F8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Margin="24"
+                Padding="28"
+                Background="#1E293B"
+                CornerRadius="20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock FontSize="15"
+                               FontWeight="SemiBold"
+                               Foreground="#93C5FD"
+                               Text="JobSearch Desktop" />
+                    <TextBlock Margin="0,8,0,0"
+                               FontSize="32"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               Text="연령층 기반 채용 추천 대시보드" />
+                    <TextBlock Margin="0,14,0,0"
+                               Foreground="#CBD5E1"
+                               Text="WPF + MVVM 메인 프로그램에서 연령대, 지역, 산업군 조건을 빠르게 조합하고 추천 기업을 확인합니다." />
+                </StackPanel>
+
+                <Border Grid.Column="1"
+                        VerticalAlignment="Top"
+                        Padding="14,10"
+                        Background="#0F172A"
+                        CornerRadius="14">
+                    <StackPanel>
+                        <TextBlock FontWeight="SemiBold"
+                                   Foreground="White"
+                                   Text="현재 상태" />
+                        <TextBlock Margin="0,6,0,0"
+                                   Foreground="#93C5FD"
+                                   Text="{Binding StatusMessage}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="24,0,24,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="340" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Padding="22"
+                    Background="White"
+                    CornerRadius="18">
+                <StackPanel>
+                    <TextBlock FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="#0F172A"
+                               Text="검색 조건" />
+                    <TextBlock Margin="0,6,0,0"
+                               Foreground="#64748B"
+                               Text="기본 조건을 입력한 뒤 추천 목록을 새로 조회합니다." />
+
+                    <TextBlock Margin="0,24,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="#334155"
+                               Text="연령대" />
+                    <ComboBox ItemsSource="{Binding AgeGroupOptions}"
+                              SelectedItem="{Binding SelectedAgeGroup}"
+                              DisplayMemberPath="DisplayName"
+                              FontSize="14" />
+
+                    <TextBlock Margin="0,18,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="#334155"
+                               Text="경력" />
+                    <TextBox Text="{Binding ExperienceLevel, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Margin="0,18,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="#334155"
+                               Text="고용 형태" />
+                    <TextBox Text="{Binding EmploymentType, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Margin="0,18,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="#334155"
+                               Text="지역" />
+                    <TextBox Text="{Binding Region, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Margin="0,18,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="#334155"
+                               Text="산업군" />
+                    <TextBox Text="{Binding Industry, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <Button Margin="0,24,0,0"
+                            Height="44"
+                            Command="{Binding SearchCommand}"
+                            Background="#2563EB"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Content="추천 목록 조회" />
+
+                    <Button Margin="0,10,0,0"
+                            Height="40"
+                            Command="{Binding ResetFiltersCommand}"
+                            Background="#E2E8F0"
+                            Foreground="#0F172A"
+                            FontWeight="SemiBold"
+                            Content="조건 초기화" />
+
+                    <Border Margin="0,24,0,0"
+                            Padding="14"
+                            Background="#F8FAFC"
+                            CornerRadius="14">
+                        <StackPanel>
+                            <TextBlock FontWeight="SemiBold"
+                                       Foreground="#0F172A"
+                                       Text="선택한 추천" />
+                            <TextBlock Margin="0,10,0,0"
+                                       FontSize="17"
+                                       FontWeight="Bold"
+                                       Foreground="#1E293B"
+                                       Text="{Binding SelectedRecommendation.CompanyName}" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Foreground="#475569"
+                                       Text="{Binding SelectedRecommendation.JobTitle}" />
+                            <TextBlock Margin="0,10,0,0"
+                                       TextWrapping="Wrap"
+                                       Foreground="#475569"
+                                       Text="{Binding SelectedRecommendation.Summary}" />
+                            <Button Margin="0,14,0,0"
+                                    HorizontalAlignment="Left"
+                                    Content="공고 자세히 보기 ➜"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    Foreground="#2563EB"
+                                    FontWeight="Bold"
+                                    Command="{Binding OpenJobUrlCommand}"
+                                    CommandParameter="{Binding SelectedRecommendation.JobUrl}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Padding="22"
+                    Background="White"
+                    CornerRadius="18">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Left">
+                            <TextBlock FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0F172A"
+                                       Text="추천 결과" />
+                            <TextBlock Margin="0,6,0,0"
+                                       Foreground="#64748B"
+                                       Text="{Binding ResultSummary}" />
+                        </StackPanel>
+
+                        <Border DockPanel.Dock="Right"
+                                VerticalAlignment="Center"
+                                Padding="12,8"
+                                Background="#DBEAFE"
+                                CornerRadius="999">
+                            <TextBlock Foreground="#1D4ED8"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding Recommendations.Count, StringFormat=총 {0}건}" />
+                        </Border>
+                    </DockPanel>
+
+                    <Grid Grid.Row="1">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="#94A3B8"
+                                   FontSize="16"
+                                   Visibility="{Binding IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                   Text="표시할 추천 데이터가 없습니다." />
+
+                        <DataGrid ItemsSource="{Binding Recommendations}"
+                                  SelectedItem="{Binding SelectedRecommendation}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single"
+                                  Margin="0,18,0,0"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  RowHeaderWidth="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="1.2*" Binding="{Binding CompanyName}" Header="기업명" />
+                                <DataGridTemplateColumn Width="1.5*" Header="공고 제목">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
+                                                <Hyperlink Command="{Binding DataContext.OpenJobUrlCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                           CommandParameter="{Binding JobUrl}">
+                                                    <TextBlock Text="{Binding JobTitle}" />
+                                                </Hyperlink>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Width="*" Binding="{Binding AgeGroupLabel}" Header="연령대" />
+                                <DataGridTextColumn Width="*" Binding="{Binding Platform}" Header="플랫폼" />
+                                <DataGridTextColumn Width="*" Binding="{Binding Region}" Header="지역" />
+                                <DataGridTextColumn Width="*" Binding="{Binding EmploymentType}" Header="고용 형태" />
+                                <DataGridTextColumn Width="*" Binding="{Binding Industry}" Header="산업군" />
+                                <DataGridTextColumn Width="0.8*" Binding="{Binding SuitabilityScore, StringFormat={}{0:P0}}" Header="적합도" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Margin="24,0,24,24"
+                Padding="14,10"
+                Background="#E2E8F0"
+                CornerRadius="14">
+            <TextBlock Foreground="#334155"
+                       Text="{Binding FooterMessage}" />
+        </Border>
+    </Grid>
+</Window>

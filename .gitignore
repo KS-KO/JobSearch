@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+.dotnet/
+tools/python-collector/output/
