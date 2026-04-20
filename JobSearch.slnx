@@ -1,13 +1,31 @@
 <Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
   <Folder Name="/src/">
-    <Project Path="src/JobSearch.Api/JobSearch.Api.csproj" />
-    <Project Path="src/JobSearch.Application/JobSearch.Application.csproj" />
-    <Project Path="src/JobSearch.Contracts/JobSearch.Contracts.csproj" />
-    <Project Path="src/JobSearch.Desktop/JobSearch.Desktop.csproj" />
-    <Project Path="src/JobSearch.Domain/JobSearch.Domain.csproj" />
-    <Project Path="src/JobSearch.Infrastructure/JobSearch.Infrastructure.csproj" />
+    <Project Path="src/JobSearch.Api/JobSearch.Api.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/JobSearch.Application/JobSearch.Application.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/JobSearch.Contracts/JobSearch.Contracts.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/JobSearch.Desktop/JobSearch.Desktop.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/JobSearch.Domain/JobSearch.Domain.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/JobSearch.Infrastructure/JobSearch.Infrastructure.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/JobSearch.UnitTests/JobSearch.UnitTests.csproj" />
+    <Project Path="tests/JobSearch.UnitTests/JobSearch.UnitTests.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
   </Folder>
 </Solution>

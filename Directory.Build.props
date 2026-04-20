@@ -1,7 +1,16 @@
 <Project>
   <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latestMajor</LangVersion>
+    <AppendPlatformToOutputPath>false</AppendPlatformToOutputPath>
+    <!-- 저장소 루트 아래에서 빌드 결과를 일관되게 관리하고 프로젝트 간 출력 충돌을 방지합니다. -->
+    <BaseOutputPath>$(MSBuildThisFileDirectory)bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+    <!-- 중간 산출물도 한곳에 모아 Debug/Release 구조를 동일하게 유지합니다. -->
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
   </PropertyGroup>
 </Project>

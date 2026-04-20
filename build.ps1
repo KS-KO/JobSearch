@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$env:DOTNET_CLI_HOME = "c:\Project\JobSearch\.dotnet"
+$env:DOTNET_CLI_HOME = Join-Path $PSScriptRoot ".dotnet"
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = "1"
 
 $projects = @(
