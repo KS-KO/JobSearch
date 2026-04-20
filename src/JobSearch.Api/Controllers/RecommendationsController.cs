@@ -33,7 +33,8 @@ public sealed class RecommendationsController : ControllerBase
             request.ExperienceLevel,
             request.EmploymentType,
             request.Region,
-            request.Industry);
+            request.Industry,
+            request.MinSalaryMillionKrw);
 
         var items = await _recommendationService
             .SearchAsync(criteria, cancellationToken)
@@ -75,5 +76,19 @@ public sealed class RecommendationsController : ControllerBase
         }
 
         return false;
+    }
+
+    [HttpGet("stats")]
+    public async Task<ActionResult<DashboardStatsResponse>> GetStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = await _recommendationService.GetStatsAsync(cancellationToken).ConfigureAwait(false);
+        var response = new DashboardStatsResponse(
+            stats.Total,
+            stats.Saramin,
+            stats.JobKorea,
+            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        );
+
+        return Ok(response);
     }
 }

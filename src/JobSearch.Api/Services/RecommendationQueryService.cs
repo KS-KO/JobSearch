@@ -48,6 +48,11 @@ public sealed class RecommendationQueryService
                 EF.Functions.Like(item.Industry, $"%{criteria.Industry}%"));
         }
 
+        if (criteria.MinSalaryMillionKrw.HasValue)
+        {
+            query = query.Where(item => item.SalaryMillionKrw >= criteria.MinSalaryMillionKrw.Value);
+        }
+
         var results = await query
             .OrderByDescending(item => item.SuitabilityScore)
             .ThenBy(item => item.CompanyName)
@@ -69,5 +74,14 @@ public sealed class RecommendationQueryService
                 item.Summary,
                 item.SuitabilityScore))
             .ToArray();
+    }
+
+    public async Task<(int Total, int Saramin, int JobKorea)> GetStatsAsync(CancellationToken cancellationToken)
+    {
+        var total = await _context.Recommendations.CountAsync(cancellationToken).ConfigureAwait(false);
+        var saramin = await _context.Recommendations.CountAsync(x => x.Platform.Contains("Saramin"), cancellationToken).ConfigureAwait(false);
+        var jobKorea = await _context.Recommendations.CountAsync(x => x.Platform.Contains("JobKorea"), cancellationToken).ConfigureAwait(false);
+
+        return (total, saramin, jobKorea);
     }
 }

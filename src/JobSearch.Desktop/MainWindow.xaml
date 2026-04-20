@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="JobSearch Desktop"
+        Icon="Assets/icon.png"
         Width="1280"
         Height="820"
         MinWidth="1080"
@@ -44,6 +45,17 @@
                     <TextBlock Margin="0,14,0,0"
                                Foreground="#CBD5E1"
                                Text="WPF + MVVM 메인 프로그램에서 연령대, 지역, 산업군 조건을 빠르게 조합하고 추천 기업을 확인합니다." />
+                    
+                    <!-- DB 데이터 요약 통계 영역 -->
+                    <Border Margin="0,16,0,0"
+                            Padding="12,8"
+                            Background="#334155"
+                            CornerRadius="8"
+                            HorizontalAlignment="Left">
+                        <TextBlock Foreground="#E2E8F0"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding DashboardStatsText}" />
+                    </Border>
                 </StackPanel>
 
                 <Border Grid.Column="1"
@@ -74,7 +86,8 @@
                     Padding="22"
                     Background="White"
                     CornerRadius="18">
-                <StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-12,0" Padding="0,0,12,0">
+                    <StackPanel>
                     <TextBlock FontSize="22"
                                FontWeight="Bold"
                                Foreground="#0F172A"
@@ -96,25 +109,39 @@
                                FontWeight="SemiBold"
                                Foreground="#334155"
                                Text="경력" />
-                    <TextBox Text="{Binding ExperienceLevel, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox ItemsSource="{Binding ExperienceOptions}"
+                              SelectedItem="{Binding ExperienceLevel}"
+                              FontSize="14" />
 
                     <TextBlock Margin="0,18,0,6"
                                FontWeight="SemiBold"
                                Foreground="#334155"
                                Text="고용 형태" />
-                    <TextBox Text="{Binding EmploymentType, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox ItemsSource="{Binding EmploymentOptions}"
+                              SelectedItem="{Binding EmploymentType}"
+                              FontSize="14" />
 
                     <TextBlock Margin="0,18,0,6"
                                FontWeight="SemiBold"
                                Foreground="#334155"
                                Text="지역" />
-                    <TextBox Text="{Binding Region, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox ItemsSource="{Binding RegionOptions}"
+                              SelectedItem="{Binding Region}"
+                              FontSize="14" />
 
                     <TextBlock Margin="0,18,0,6"
                                FontWeight="SemiBold"
                                Foreground="#334155"
                                Text="산업군" />
-                    <TextBox Text="{Binding Industry, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox ItemsSource="{Binding IndustryOptions}"
+                              SelectedItem="{Binding Industry}"
+                              FontSize="14" />
+
+                    <TextBlock Margin="0,18,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="#334155"
+                               Text="최소 연봉 (백만원)" />
+                    <TextBox Text="{Binding MinSalary, UpdateSourceTrigger=PropertyChanged}" />
 
                     <Button Margin="0,24,0,0"
                             Height="44"
@@ -131,6 +158,46 @@
                             Foreground="#0F172A"
                             FontWeight="SemiBold"
                             Content="조건 초기화" />
+
+                    <Border Margin="0,24,0,0"
+                            Padding="14"
+                            Background="#FFFBEB"
+                            BorderBrush="#FDE68A"
+                            BorderThickness="1"
+                            CornerRadius="14">
+                        <StackPanel>
+                            <TextBlock FontWeight="SemiBold"
+                                       Foreground="#B45309"
+                                       Text="⭐ 관심 키워드 알림 설정" />
+                            <TextBlock Margin="0,4,0,6"
+                                       FontSize="12"
+                                       Foreground="#D97706"
+                                       Text="매칭되는 공고가 있으면 알려드려요." />
+                                       
+                            <TextBlock Margin="0,8,0,4"
+                                       FontWeight="SemiBold"
+                                       Foreground="#92400E"
+                                       Text="자동 갱신 주기" />
+                            <ComboBox ItemsSource="{Binding RefreshOptions}"
+                                      SelectedItem="{Binding SelectedRefreshOption}"
+                                      DisplayMemberPath="DisplayName"
+                                      FontSize="14" />
+
+                            <TextBlock Margin="0,12,0,4"
+                                       FontWeight="SemiBold"
+                                       Foreground="#92400E"
+                                       Text="관심 키워드 입력" />
+                            <TextBox Text="{Binding InterestKeywordsText, UpdateSourceTrigger=PropertyChanged}" 
+                                     ToolTip="단어를 쉼표(,)로 구분해 입력하세요" />
+                            <Button Margin="0,10,0,0"
+                                    Height="32"
+                                    Command="{Binding SaveKeywordsCommand}"
+                                    Background="#F59E0B"
+                                    Foreground="White"
+                                    FontWeight="SemiBold"
+                                    Content="관심 저장" />
+                        </StackPanel>
+                    </Border>
 
                     <Border Margin="0,24,0,0"
                             Padding="14"
@@ -162,7 +229,8 @@
                                     CommandParameter="{Binding SelectedRecommendation.JobUrl}" />
                         </StackPanel>
                     </Border>
-                </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </Border>
 
             <Border Grid.Column="2"
@@ -171,6 +239,7 @@
                     CornerRadius="18">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
@@ -197,7 +266,20 @@
                         </Border>
                     </DockPanel>
 
-                    <Grid Grid.Row="1">
+                    <Border Grid.Row="1"
+                            Margin="0,12,0,0"
+                            Padding="12,10"
+                            Background="#F0FDF4"
+                            BorderBrush="#BBF7D0"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Visibility="{Binding NotificationMessage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Foreground="#15803D"
+                                   FontWeight="Bold"
+                                   Text="{Binding NotificationMessage}" />
+                    </Border>
+
+                    <Grid Grid.Row="2">
                         <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    Foreground="#94A3B8"

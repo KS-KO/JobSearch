@@ -19,6 +19,7 @@ public sealed class RecommendationApiService
         string? emp,
         string? region,
         string? industry,
+        int? minSalary,
         CancellationToken cancellationToken)
     {
         var url = "api/recommendations/search?";
@@ -27,6 +28,7 @@ public sealed class RecommendationApiService
         if (!string.IsNullOrEmpty(emp)) url += $"employmentType={emp}&";
         if (!string.IsNullOrEmpty(region)) url += $"region={region}&";
         if (!string.IsNullOrEmpty(industry)) url += $"industry={industry}&";
+        if (minSalary.HasValue) url += $"minSalaryMillionKrw={minSalary.Value}&";
 
         var response = await _httpClient.GetFromJsonAsync<RecommendationResponse[]>(url, cancellationToken).ConfigureAwait(false);
         
@@ -58,6 +60,18 @@ public sealed class RecommendationApiService
         _ => value
     };
 
+    public async Task<DashboardStatsResponse?> GetDashboardStatsAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<DashboardStatsResponse>("api/recommendations/stats", cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private record RecommendationResponse(
         string CompanyName,
         string JobTitle,
@@ -71,4 +85,10 @@ public sealed class RecommendationApiService
         int SalaryMillionKrw,
         string Summary,
         double SuitabilityScore);
+        
+    public record DashboardStatsResponse(
+        int TotalCount,
+        int SaraminCount,
+        int JobKoreaCount,
+        string LastUpdatedTime);
 }

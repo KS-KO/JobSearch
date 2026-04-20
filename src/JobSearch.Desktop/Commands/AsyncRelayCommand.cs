@@ -32,7 +32,7 @@ public sealed class AsyncRelayCommand : ICommand
         {
             _isRunning = true;
             RaiseCanExecuteChanged();
-            await _executeAsync().ConfigureAwait(false);
+            await _executeAsync().ConfigureAwait(true);
         }
         finally
         {

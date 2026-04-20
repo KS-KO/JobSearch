@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\JobSearch.Api\Data\recommendations.sample.json" Link="Data\recommendations.sample.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -7,4 +7,5 @@ public sealed record RecommendationCriteria(
     string? ExperienceLevel,
     string? EmploymentType,
     string? Region,
-    string? Industry);
+    string? Industry,
+    int? MinSalaryMillionKrw = null);

@@ -11,4 +11,6 @@ public sealed class RecommendationSearchRequest
     public string? Region { get; init; }
 
     public string? Industry { get; init; }
+
+    public int? MinSalaryMillionKrw { get; init; }
 }
