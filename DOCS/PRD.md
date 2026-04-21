@@ -187,3 +187,11 @@
 - 2026-04-20: 사용자 요청에 따라 빌드 산출물 경로에서 플랫폼 하위 폴더(x64 등)를 제외해 경로를 추가로 단순화한다.
 - 2026-04-20: 사용자 요청에 따라 `JobSearch.Desktop` 시작 시 `JobSearch.Api`를 자동 실행하고, 헬스 체크 완료 후 초기화를 진행하도록 실행 흐름을 보강한다.
 - 2026-04-20: 사용자 요청에 따라 로컬 개발 환경에서 `클린 -> 빌드 -> 실행` 순서로 전체 동작을 점검한다.
+- 2026-04-21: ?ъ슜???붿껌???곕씪 SQLite 湲곕컲 ?곗씠???議고쉶 媛?ν븳吏 DB ?덈퐫?쒖? API ?묐떟??湲곗??쇰줈 ?뺤씤?섎뒗 寃利앺븯??以묒씠??.
+- 2026-04-21: ?ъ슜???붿껌???곕씪 濡쒖뺄 HTTP ?ㅽ뻾 ???뚮뒗 HTTPS 由щ떎?대젆??臾몄젣瑜?議곗젙?섍퀬, ?띿뾽 猷⑦듃 `JobSearch.db`瑜? ?곗꽑??李얠븘 ?곗씠???議고쉶媛 ?뺤긽 ?묐떟?섎룄濡??섏젙?쒕떎.
+- 2026-04-21: ?ъ슜???붿껌???곕씪 `Search API` 珥덇린 ?ㅽ뻾怨?寃??理쒖큹濡쒕뵫?쓣 UI ?ㅽ젅?쒕뱶?먯꽌 遺꾨━?섍퀬 諛곌꼍 ?묒뾽?쇰줈 泥섎━?섎룄濡??섏젙?쒕떎.
+- 2026-04-21: ??????遺욧퍕???怨뺤뵬 ?뺣뼄??寃??踰꾪듉 ?ъ슜?먭? ?뚯쓽濡??щⅨ??`?ㅼ떆媛?寃??`??諛붾줈 ?쒖옉?댄븷 ???덈룄濡?UI 踰꾪듉怨?紐낅졊 ?뺤쓣 異붽??섏젙?쒕떎.
+- 2026-04-21: Realtime search button text encoding fix applied in Desktop UI.
+- 2026-04-21: Equipment-oriented search profile setting UI and persistence were added to Desktop.
+- 2026-04-21: Search profile controls were moved from runtime injection to explicit XAML so the settings area is always visible.
+- 2026-04-21: Realtime search was updated to run the Python collector in the background before reloading recommendations from SQLite.

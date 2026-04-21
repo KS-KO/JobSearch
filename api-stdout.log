@@ -1,0 +1,31 @@
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (21ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://127.0.0.1:5058
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: F:\Project\JobSearch\bin\JobSearch.Api\Debug\net10.0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM "Recommendations" AS "r"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM "Recommendations" AS "r"
+      WHERE instr("r"."Platform", 'Saramin') > 0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM "Recommendations" AS "r"
+      WHERE instr("r"."Platform", 'JobKorea') > 0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@criteria_AgeGroup='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      SELECT "r"."Id", "r"."AgeGroup", "r"."CompanyName", "r"."EmploymentType", "r"."ExperienceLevel", "r"."Industry", "r"."JobTitle", "r"."JobUrl", "r"."Platform", "r"."Region", "r"."SalaryMillionKrw", "r"."SuitabilityScore", "r"."Summary"
+      FROM "Recommendations" AS "r"
+      WHERE "r"."AgeGroup" = @criteria_AgeGroup
+      ORDER BY "r"."SuitabilityScore" DESC, "r"."CompanyName"

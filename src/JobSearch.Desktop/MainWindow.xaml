@@ -153,6 +153,14 @@
 
                     <Button Margin="0,10,0,0"
                             Height="40"
+                            Command="{Binding StartRealtimeSearchCommand}"
+                            Background="#0F766E"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Content="?ㅼ떆媛?寃?? ?쒖옉" />
+
+                    <Button Margin="0,10,0,0"
+                            Height="40"
                             Command="{Binding ResetFiltersCommand}"
                             Background="#E2E8F0"
                             Foreground="#0F172A"
@@ -178,6 +186,22 @@
                                        FontWeight="SemiBold"
                                        Foreground="#92400E"
                                        Text="자동 갱신 주기" />
+                            <TextBlock Margin="0,8,0,4"
+                                       FontWeight="SemiBold"
+                                       Foreground="#92400E"
+                                       Text="&#xD0D0;&#xC0C9; &#xD504;&#xB85C;&#xD544;" />
+                            <ComboBox ItemsSource="{Binding SearchProfileOptions}"
+                                      SelectedItem="{Binding SelectedSearchProfile}"
+                                      DisplayMemberPath="DisplayName"
+                                      FontSize="14" />
+                            <Button Margin="0,10,0,0"
+                                    Height="32"
+                                    Command="{Binding ApplySearchProfileCommand}"
+                                    Background="#D97706"
+                                    Foreground="White"
+                                    FontWeight="SemiBold"
+                                    Content="&#xD504;&#xB85C;&#xD544; &#xC124;&#xC815; &#xC801;&#xC6A9;" />
+
                             <ComboBox ItemsSource="{Binding RefreshOptions}"
                                       SelectedItem="{Binding SelectedRefreshOption}"
                                       DisplayMemberPath="DisplayName"
