@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace JobSearch.Desktop.Services;
@@ -9,7 +10,7 @@ public sealed class CollectorHostService
     private static readonly TimeSpan CollectorTimeout = TimeSpan.FromMinutes(3);
     private readonly SemaphoreSlim _executionGate = new(1, 1);
 
-    public async Task<CollectorRunResult> RunAsync(CancellationToken cancellationToken)
+    public async Task<CollectorRunResult> RunAsync(string[]? keywords, string[]? ageGroups, CancellationToken cancellationToken)
     {
         await _executionGate.WaitAsync(cancellationToken).ConfigureAwait(false);
 
@@ -24,7 +25,6 @@ public sealed class CollectorHostService
             var startInfo = new ProcessStartInfo
             {
                 FileName = "python",
-                ArgumentList = { collectorScriptPath },
                 WorkingDirectory = Path.GetDirectoryName(collectorScriptPath) ?? AppContext.BaseDirectory,
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -33,6 +33,20 @@ public sealed class CollectorHostService
                 StandardOutputEncoding = Encoding.UTF8,
                 StandardErrorEncoding = Encoding.UTF8
             };
+
+            startInfo.ArgumentList.Add(collectorScriptPath);
+
+            if (keywords is { Length: > 0 })
+            {
+                startInfo.ArgumentList.Add("--keywords");
+                startInfo.ArgumentList.Add(string.Join(",", keywords));
+            }
+
+            if (ageGroups is { Length: > 0 })
+            {
+                startInfo.ArgumentList.Add("--age-groups");
+                startInfo.ArgumentList.Add(string.Join(",", ageGroups.Select(a => a.ToLowerInvariant())));
+            }
 
             using var process = Process.Start(startInfo)
                 ?? throw new InvalidOperationException("Python 수집기 프로세스를 시작하지 못했습니다.");

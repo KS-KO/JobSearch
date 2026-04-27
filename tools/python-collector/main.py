@@ -1,4 +1,5 @@
 import sqlite3
+import argparse
 from pathlib import Path
 from models import RecommendationRecord
 from scraper import scrape_saramin, scrape_jobkorea
@@ -58,14 +59,30 @@ def save_to_sqlite(records: list[RecommendationRecord], db_path: Path):
     return count
 
 def main():
+    parser = argparse.ArgumentParser(description="JobSearch Data Collector")
+    parser.add_argument("--keywords", type=str, help="Comma separated keywords to search")
+    parser.add_argument("--age-groups", type=str, help="Comma separated age groups (twenties, thirties, forties, fiftiesAndAbove)")
+    args = parser.parse_args()
+
     root = Path(__file__).resolve().parent.parent.parent
     db_path = root / "JobSearch.db"
     
-    print("=== JobSearch Data Collector (Phase 2) ===")
+    print("=== JobSearch Data Collector (Phase 2 - Dynamic) ===")
     
-    keywords = ["개발자", "데이터 엔지니어", "영업"]
-    age_groups = ["twenties", "thirties", "forties", "fiftiesAndAbove"]
+    # 인자로 넘어온 키워드가 있으면 사용, 없으면 기본값 사용
+    if args.keywords:
+        keywords = [k.strip() for k in args.keywords.split(",") if k.strip()]
+    else:
+        keywords = ["개발자", "데이터 엔지니어", "영업"]
+        
+    if args.age_groups:
+        age_groups = [a.strip() for a in args.age_groups.split(",") if a.strip()]
+    else:
+        age_groups = ["twenties", "thirties", "forties", "fiftiesAndAbove"]
     
+    print(f"Target Keywords: {keywords}")
+    print(f"Target Age Groups: {age_groups}")
+
     total_records = []
     
     for age in age_groups:

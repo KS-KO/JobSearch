@@ -199,19 +199,18 @@
 - 2026-04-21: Search profile controls were moved from runtime injection to explicit XAML so the settings area is always visible.
 - 2026-04-21: Realtime search was updated to run the Python collector in the background before reloading recommendations from SQLite.
 - 2026-04-22: 남아 있는 작업, 작업 중인 작업 및 추가 작업을 정리하여 로드맵을 수립한다.
+- 2026-04-27: '동적 수집 파라미터 연동' 작업을 위해 Python 환경 구성을 확인하고, 수집기(Main.py) 및 C# 호스트 서비스(CollectorHostService)를 수정하여 UI에서 입력한 키워드가 수집기에 전달되도록 구현을 진행함.
 
-## 14. 작업 로드맵 상세 (2026-04-22 기준)
+## 14. 작업 로드맵 상세 (2026-04-27 기준)
 
 ### 14.1 진행 중인 작업 (In-Progress)
-- **동적 수집 파라미터 연동**: `JobSearch.Desktop`에서 설정한 '관심 키워드'를 Python 수집기의 인자로 전달하는 기능입니다. 현재 `main.py`에 키워드가 하드코딩(`개발자`, `데이터 엔지니어`, `영업`)되어 있으며, 이를 CLI 인자로 받아 처리하도록 수정 중입니다.
-- **실시간 수집 상태 피드백 구현**: `MainViewModel`에서 수집기 실행 시 `StatusMessage`를 통해 텍스트로만 상태를 알리고 있습니다. 이를 시각적으로 명확히 하기 위해 `ProgressBar` 연동을 위한 전용 프로퍼티 및 UI 업데이트 로직을 보완하고 있습니다.
-
-### 14.2 남은 작업 (Remaining)
-- **보고서 자동 생성 및 내보내기**: `Recommendations` 리스트를 Markdown(`.md`) 또는 CSV 파일로 변환하여 `DOCS/Reports` 폴더에 자동 저장하는 기능을 구현해야 합니다.
-- **데이터 정제 알고리즘 고도화**: 현재 DB의 `UNIQUE INDEX`를 통한 중복 방지 외에, 회사명에서 `(주)`, `주식회사` 등 수식어를 제거하고 비교하거나, 유사한 공고 제목을 그룹화하는 정제 로직이 필요합니다.
-- **예외 처리 및 안전성 강화**: Python 환경 미설치, 네트워크 타임아웃, 또는 크롤링 차단 발생 시 `CollectorHostService`에서 이를 감지하고 사용자에게 구체적인 복구 가이드(예: "잠시 후 다시 시도")를 제공해야 합니다.
+- [x] **동적 수집 파라미터 연동**: `JobSearch.Desktop`에서 설정한 '관심 키워드'를 Python 수집기의 인자로 전달하는 기능입니다. 인자 수신 및 C# 연동을 완료했습니다.
+- [x] **수집 라이브러리 검증 및 설치**: `requests`, `beautifulsoup4` 설치 및 작동 확인을 완료했습니다.
+- [x] **실시간 수집 상태 피드백 구현**: `ProgressBar` 연동 및 UI 보완 작업을 완료했습니다.
+- [x] **잡코리아 수집기 고도화**: 전용 API 호출 방식을 적용하여 수집 안정성을 확보했습니다.
+- [x] **보고서 자동 생성 및 내보내기**: `Recommendations` 리스트를 CSV 형식으로 저장하는 기능입니다. UTF-8 (BOM 포함) 인코딩을 적용하여 엑셀 가독성을 확보하고, UI에 내보내기 버튼을 추가했습니다.
+- [ ] **데이터 정제 알고리즘 고도화**: 회사명 정규화 및 유사 공고 그룹화 로직. (진행 예정)
 
 ### 14.3 추가 작업 (Additional / Backlog)
-- **수집 플랫폼 확장**: 현재 사람인, 잡코리아 외에도 원티드(Wanted), 인크루트(Incruit) 등으로 수집 대상을 확장할 예정입니다.
-- **AI 기반 매칭 스코어링**: 사용자의 선호 산업군과 실제 공고 텍스트의 유사도를 분석하여 수집 데이터에 `SuitabilityScore` 가중치를 더 정교하게 반영합니다.
-- **데스크톱 알림 (Notification)**: 백그라운드 수집 완료 시, 사용자가 설정한 키워드와 일치하는 새 공고가 발견되면 Windows 토스트 알림을 띄우는 기능입니다.
+- **수집 플랫폼 확장**: 원티드, 인크루트 등 추가.
+- **AI 기반 매칭 스코어링**: 유사도 분석 가중치 반영.

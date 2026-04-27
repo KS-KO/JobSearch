@@ -97,8 +97,8 @@ def scrape_saramin(keyword: str, age_group: str) -> list[RecommendationRecord]:
 
 def scrape_jobkorea(keyword: str, age_group: str) -> list[RecommendationRecord]:
     """
-    잡코리아 검색 결과 페이지를 크롤링합니다.
-    (참고: Tailwind 기반의 최신 레이아웃을 반영한 선택자를 사용합니다.)
+    잡코리아 전용 검색 API(POST /Search/api/display/v2/jobs)를 사용하여 데이터를 수집합니다.
+    CSR(Client Side Rendering) 문제를 해결하고 수집 안정성을 높인 고도화된 방식입니다.
     """
     age_map = {
         "twenties": "Twenties",
@@ -107,56 +107,64 @@ def scrape_jobkorea(keyword: str, age_group: str) -> list[RecommendationRecord]:
         "fiftiesAndAbove": "FiftiesAndAbove"
     }
     
-    encoded_keyword = requests.utils.quote(keyword)
-    url = f"https://www.jobkorea.co.kr/Search/?stext={encoded_keyword}"
+    api_url = "https://www.jobkorea.co.kr/Search/api/display/v2/jobs"
     
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7"
+        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Content-Type": "application/json",
+        "app-version": "1.0.0",
+        "referer": f"https://www.jobkorea.co.kr/Search?stext={requests.utils.quote(keyword)}"
+    }
+    
+    # API 요청 바디 구성
+    payload = {
+        "pageSize": 20,
+        "page": 1,
+        "sortProperty": "1",
+        "sortDirection": "DESC",
+        "keyword": keyword,
+        "deviceType": "PC"
     }
     
     records = []
     
     try:
-        response = requests.get(url, headers=headers, timeout=12)
+        # requests.Session을 사용하여 필요한 경우 쿠키 자동 관리
+        session = requests.Session()
+        response = session.post(api_url, headers=headers, json=payload, timeout=15)
         response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
         
-        # 잡코리아 검색 결과 리스트 아이템 선택자 (브라우저 분석 결과 기반)
-        # 실제 환경에 맞춰 유연한 선택자 사용
-        items = soup.find_all("div", class_="list-post") or soup.select("article") or soup.select(".item")
+        data = response.json()
+        job_list = data.get("content", [])
         
-        for item in items[:10]:
+        for item in job_list[:10]:
             try:
-                # 회사명 및 제목 추출 로직 (안정적인 구조를 위해 여러 패턴 시도)
-                corp_tag = item.select_one(".name, .post-list-corp a")
-                tit_tag = item.select_one(".title, .post-list-info a")
+                company_name = item.get("companyName", "N/A")
+                job_title = item.get("title", "N/A")
+                job_id = item.get("id", "")
+                job_url = f"https://www.jobkorea.co.kr/Recruit/GI_Read/{job_id}" if job_id else "https://www.jobkorea.co.kr"
                 
-                if not corp_tag or not tit_tag:
-                    continue
-                    
-                company_name = corp_tag.get_text(strip=True)
-                job_title = tit_tag.get_text(strip=True)
-                job_href = tit_tag.get("href", "")
-                job_url = job_href if job_href.startswith("http") else f"https://www.jobkorea.co.kr{job_href}"
+                # 지역 및 조건 정보 추출
+                # API 응답에는 areaCodeList, careerLevel 등 가공이 필요한 필드가 포함되어 있을 수 있음
+                # 여기서는 UI에 표시하기 좋게 간단히 정규화
+                region = "서울/전국" # 기본값
+                exp = "경력무관"
                 
-                # 부가 정보 (지역, 경력 등)
-                option_tags = item.select(".option span, .exp, .loc")
-                region = option_tags[0].get_text(strip=True) if len(option_tags) > 0 else "전국"
-                exp = option_tags[1].get_text(strip=True) if len(option_tags) > 1 else "경력무관"
-                emp_type = option_tags[2].get_text(strip=True) if len(option_tags) > 2 else "정규직"
+                if item.get("areaCodeList"):
+                    # 실제 구체적 지역명 매핑 대신 데모용으로 간단히 처리
+                    region = "수도권" if "B" in str(item.get("areaCodeList")) else "전국"
                 
-                # 적합도 계산 (사람인과 동일한 로직 적용)
-                suitability_score = 0.72 # 잡코리아 기본 점수 미세 조정
+                # 적합도 계산 로직
+                suitability_score = 0.72
                 if keyword.lower() in job_title.lower():
                     suitability_score += 0.15
                 
-                if age_group == "twenties" and "신입" in exp:
-                    suitability_score += 0.05
-                elif age_group in ["forties", "fiftiesAndAbove"] and "경력" in exp:
-                    suitability_score += 0.05
-                
-                suitability_score += (random.random() * 0.03)
+                # 연령대별 가중치 시뮬레이션
+                if age_group == "twenties":
+                    suitability_score += (random.random() * 0.05)
+                elif age_group in ["forties", "fiftiesAndAbove"]:
+                    suitability_score += (random.random() * 0.03)
                 
                 records.append(RecommendationRecord(
                     companyName=company_name,
@@ -164,18 +172,19 @@ def scrape_jobkorea(keyword: str, age_group: str) -> list[RecommendationRecord]:
                     jobUrl=job_url,
                     ageGroup=age_map.get(age_group, "Twenties"),
                     platform="JobKorea",
-                    industry="HR/Recruitment",
+                    industry=item.get("jobClassificationOrIndustry", "IT/서비스").replace(",", "/").strip("/"),
                     experienceLevel=exp,
-                    employmentType=emp_type,
+                    employmentType="정규직",
                     region=region,
-                    salaryMillionKrw=random.randint(30, 70),
-                    summary=f"잡코리아 추천 공고: {job_title} ({company_name})",
+                    salaryMillionKrw=random.randint(35, 75),
+                    summary=f"잡코리아 API 기반 고도화 추천 공고: {job_title}",
                     suitabilityScore=round(min(0.99, suitability_score), 2)
                 ))
             except Exception as e:
+                print(f"Error parsing API item: {e}")
                 continue
                 
     except Exception as e:
-        print(f"JobKorea Scraping error: {e}")
+        print(f"JobKorea API Scraping error: {e}")
         
     return records

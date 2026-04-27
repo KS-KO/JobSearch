@@ -70,6 +70,13 @@
                         <TextBlock Margin="0,6,0,0"
                                    Foreground="#93C5FD"
                                    Text="{Binding StatusMessage}" />
+                        <ProgressBar Margin="0,8,0,0"
+                                     Height="4"
+                                     Background="#334155"
+                                     Foreground="#3B82F6"
+                                     BorderThickness="0"
+                                     IsIndeterminate="True"
+                                     Visibility="{Binding IsCollecting, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </StackPanel>
                 </Border>
             </Grid>
@@ -279,15 +286,26 @@
                                        Text="{Binding ResultSummary}" />
                         </StackPanel>
 
-                        <Border DockPanel.Dock="Right"
-                                VerticalAlignment="Center"
-                                Padding="12,8"
-                                Background="#DBEAFE"
-                                CornerRadius="999">
-                            <TextBlock Foreground="#1D4ED8"
-                                       FontWeight="SemiBold"
-                                       Text="{Binding Recommendations.Count, StringFormat=총 {0}건}" />
-                        </Border>
+                        <StackPanel DockPanel.Dock="Right"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <Button Margin="0,0,12,0"
+                                    Padding="12,6"
+                                    Command="{Binding ExportReportCommand}"
+                                    Background="#F8FAFC"
+                                    Foreground="#475569"
+                                    BorderBrush="#CBD5E1"
+                                    BorderThickness="1"
+                                    Cursor="Hand"
+                                    Content="보고서 저장 💾" />
+                            <Border Padding="12,8"
+                                    Background="#DBEAFE"
+                                    CornerRadius="999">
+                                <TextBlock Foreground="#1D4ED8"
+                                           FontWeight="SemiBold"
+                                           Text="{Binding Recommendations.Count, StringFormat=총 {0}건}" />
+                            </Border>
+                        </StackPanel>
                     </DockPanel>
 
                     <Border Grid.Row="1"

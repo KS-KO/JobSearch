@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -13,8 +14,10 @@ public sealed class MainViewModel : ViewModelBase
     private readonly RecommendationApiService _apiService;
     private readonly CollectorHostService _collectorHostService;
     private readonly UserSettingsService _settingsService;
+    private readonly ExportService _exportService;
     private readonly AsyncRelayCommand _searchCommand;
     private readonly AsyncRelayCommand _startRealtimeSearchCommand;
+    private readonly AsyncRelayCommand _exportReportCommand;
     private readonly AsyncRelayCommand _applySearchProfileCommand;
     private readonly RelayCommand _resetFiltersCommand;
     private readonly RelayCommand<string> _openJobUrlCommand;
@@ -36,6 +39,8 @@ public sealed class MainViewModel : ViewModelBase
     private string _notificationMessage = string.Empty;
     private bool _isEmpty = true;
     private bool _isResettingFilters;
+    private bool _isCollecting;
+    private double _collectionProgress;
     private readonly DispatcherTimer _autoRefreshTimer;
     private RefreshOption _selectedRefreshOption = default!;
 
@@ -112,8 +117,11 @@ public sealed class MainViewModel : ViewModelBase
         _autoRefreshTimer = new DispatcherTimer();
         _autoRefreshTimer.Tick += (s, e) => _ = SearchAsync();
 
+        _exportService = new ExportService();
+
         _searchCommand = new AsyncRelayCommand(SearchAsync);
         _startRealtimeSearchCommand = new AsyncRelayCommand(StartRealtimeSearchAsync);
+        _exportReportCommand = new AsyncRelayCommand(ExportReportAsync);
         _applySearchProfileCommand = new AsyncRelayCommand(ApplySelectedSearchProfileAsync);
         _resetFiltersCommand = new RelayCommand(ResetFilters);
         _openJobUrlCommand = new RelayCommand<string>(OpenJobUrl);
@@ -130,6 +138,7 @@ public sealed class MainViewModel : ViewModelBase
     public IReadOnlyList<SearchProfileOption> SearchProfileOptions { get; }
     public ICommand SearchCommand => _searchCommand;
     public ICommand StartRealtimeSearchCommand => _startRealtimeSearchCommand;
+    public ICommand ExportReportCommand => _exportReportCommand;
     public ICommand ApplySearchProfileCommand => _applySearchProfileCommand;
     public ICommand ResetFiltersCommand => _resetFiltersCommand;
     public ICommand OpenJobUrlCommand => _openJobUrlCommand;
@@ -273,6 +282,18 @@ public sealed class MainViewModel : ViewModelBase
         private set => SetProperty(ref _isEmpty, value);
     }
 
+    public bool IsCollecting
+    {
+        get => _isCollecting;
+        private set => SetProperty(ref _isCollecting, value);
+    }
+
+    public double CollectionProgress
+    {
+        get => _collectionProgress;
+        private set => SetProperty(ref _collectionProgress, value);
+    }
+
     public void UpdateStartupState(string statusMessage, string footerMessage)
     {
         StatusMessage = statusMessage;
@@ -338,23 +359,38 @@ public sealed class MainViewModel : ViewModelBase
 
             StatusMessage = "\uC2E4\uC2DC\uAC04 \uAC80\uC0C9\uC744 \uC2DC\uC791\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4...";
             FooterMessage = "\uC0AC\uB78C\uC778\uACFC \uC7A1\uCF54\uB9AC\uC544 \uB370\uC774\uD130\uB97C \uBC31\uADF8\uB77C\uC6B4\uB4DC\uC5D0\uC11C \uC218\uC9D1\uD558\uB294 \uC911\uC785\uB2C8\uB2E4.";
+            IsCollecting = true;
 
-            var collectorResult = await _collectorHostService.RunAsync(CancellationToken.None).ConfigureAwait(true);
-            if (!collectorResult.Succeeded)
+            try
             {
-                StatusMessage = "\uC2E4\uC2DC\uAC04 \uC218\uC9D1 \uC2E4\uD328";
-                FooterMessage = string.IsNullOrWhiteSpace(collectorResult.StandardError)
-                    ? $"\uC218\uC9D1\uAE30 \uC885\uB8CC \uCF54\uB4DC: {collectorResult.ExitCode}"
-                    : collectorResult.StandardError;
-                return;
+                var keywords = InterestKeywordsText
+                    .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                var ageGroups = SelectedAgeGroup?.Value is { } ageValue
+                    ? new[] { ageValue }
+                    : Array.Empty<string>();
+
+                var collectorResult = await _collectorHostService.RunAsync(keywords, ageGroups, CancellationToken.None).ConfigureAwait(true);
+                if (!collectorResult.Succeeded)
+                {
+                    StatusMessage = "\uC2E4\uC2DC\uAC04 \uC218\uC9D1 \uC2E4\uD328";
+                    FooterMessage = string.IsNullOrWhiteSpace(collectorResult.StandardError)
+                        ? $"\uC218\uC9D1\uAE30 \uC885\uB8CC \uCF54\uB4DC: {collectorResult.ExitCode}"
+                        : collectorResult.StandardError;
+                    return;
+                }
+
+                StatusMessage = "\uC218\uC9D1 \uC644\uB8CC, \uCD5C\uC2E0 \uACF5\uACE0\uB97C \uB2E4\uC2DC \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4.";
+                FooterMessage = string.IsNullOrWhiteSpace(collectorResult.StandardOutput)
+                    ? $"{realtimeOption.DisplayName} \uC8FC\uAE30 \uC2E4\uC2DC\uAC04 \uAC80\uC0C9 \uACB0\uACFC\uB97C \uC801\uC6A9\uD569\uB2C8\uB2E4."
+                    : collectorResult.StandardOutput;
+
+                await SearchAsync().ConfigureAwait(true);
             }
-
-            StatusMessage = "\uC218\uC9D1 \uC644\uB8CC, \uCD5C\uC2E0 \uACF5\uACE0\uB97C \uB2E4\uC2DC \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4.";
-            FooterMessage = string.IsNullOrWhiteSpace(collectorResult.StandardOutput)
-                ? $"{realtimeOption.DisplayName} \uC8FC\uAE30 \uC2E4\uC2DC\uAC04 \uAC80\uC0C9 \uACB0\uACFC\uB97C \uC801\uC6A9\uD569\uB2C8\uB2E4."
-                : collectorResult.StandardOutput;
-
-            await SearchAsync().ConfigureAwait(true);
+            finally
+            {
+                IsCollecting = false;
+            }
         }
         catch (Exception exception)
         {
@@ -417,6 +453,36 @@ public sealed class MainViewModel : ViewModelBase
         else
         {
             DashboardStatsText = "\uD1B5\uACC4 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.";
+        }
+    }
+
+    private async Task ExportReportAsync()
+    {
+        if (Recommendations.Count == 0)
+        {
+            StatusMessage = "\uB0B4\uBCF4\uB2AC \uB370\uC774\uD130\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.";
+            return;
+        }
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Filter = "CSV \uD30C\uC77C (*.csv)|*.csv",
+            FileName = $"JobSearch_\uBC14\uACE0\uC11C_{DateTime.Now:yyyyMMdd_HHmm}.csv"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            try
+            {
+                await _exportService.ExportToCsvAsync(dialog.FileName, Recommendations).ConfigureAwait(true);
+                StatusMessage = "\uBC14\uACE0\uC11C \uB0B4\uBCF4\uB0B4\uAE30 \uC644\uB8CC";
+                FooterMessage = $"\uD30C\uC77C \uC800\uC7A5 \uC644\uB8CC: {Path.GetFileName(dialog.FileName)}";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "\uB0B4\uBCF4\uB0B4\uAE30 \uC2E4\uD328";
+                FooterMessage = $"\uC624\uB958: {ex.Message}";
+            }
         }
     }
 
