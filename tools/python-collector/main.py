@@ -73,7 +73,7 @@ def main():
     if args.keywords:
         keywords = [k.strip() for k in args.keywords.split(",") if k.strip()]
     else:
-        keywords = ["개발자", "데이터 엔지니어", "영업"]
+        keywords = ["개발자"]
         
     if args.age_groups:
         age_groups = [a.strip() for a in args.age_groups.split(",") if a.strip()]
